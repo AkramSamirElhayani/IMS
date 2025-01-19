@@ -105,6 +105,18 @@ namespace IMS.Domain.Aggregates
             AddDomainEvent(new ItemActivatedEvent(Id));
         }
 
+        public void UpdateBasicProperties(
+            string name,
+            ItemType type,
+            bool isPerishable)
+        {
+            Name = name ?? throw new ArgumentNullException(nameof(name));
+            Type = type;
+            IsPerishable = isPerishable;
+            
+            AddDomainEvent(new ItemUpdatedEvent(Id));
+        }
+
         public bool CanWithdraw(int quantity)
         {
             return IsActive 

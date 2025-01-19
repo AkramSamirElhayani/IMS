@@ -21,7 +21,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Core\IMS.Application\IMS.Application.csproj" />
     <ProjectReference Include="..\..\src\Core\IMS.Domain\IMS.Domain.csproj" />
+    <ProjectReference Include="..\..\src\Infrastructure\IMS.Infrastructure\IMS.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

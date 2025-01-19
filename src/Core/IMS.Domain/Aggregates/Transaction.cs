@@ -17,6 +17,7 @@ namespace IMS.Domain.Aggregates
         public string SourceLocation { get; private set; }
         public string DestinationLocation { get; private set; }
         public BatchInformation BatchInfo { get; private set; }
+        public DateTimeOffset TransactionDate { get; private set; }
 
         private Transaction(
             TransactionReference reference,
@@ -25,7 +26,8 @@ namespace IMS.Domain.Aggregates
             int quantity,
             string sourceLocation,
             string destinationLocation,
-            BatchInformation batchInfo = null)
+            BatchInformation batchInfo = null,
+            DateTimeOffset? transactionDate = null)
         {
             if (quantity <= 0)
                 throw new ArgumentException("Quantity must be greater than zero", nameof(quantity));
@@ -38,6 +40,7 @@ namespace IMS.Domain.Aggregates
             SourceLocation = sourceLocation;
             DestinationLocation = destinationLocation;
             BatchInfo = batchInfo;
+            TransactionDate = transactionDate ?? DateTimeOffset.UtcNow;
 
             AddDomainEvent(new TransactionCreatedEvent(Id, ItemId, Type, Quantity));
         }
@@ -47,7 +50,8 @@ namespace IMS.Domain.Aggregates
             int quantity,
             string destinationLocation,
             TransactionType type,
-            BatchInformation batchInfo = null)
+            BatchInformation batchInfo = null,
+            DateTimeOffset? transactionDate = null)
         {
             if (!IsInboundTransaction(type))
                 throw new ArgumentException("Invalid transaction type for inbound transaction", nameof(type));
@@ -61,7 +65,8 @@ namespace IMS.Domain.Aggregates
                 quantity,
                 null,
                 destinationLocation,
-                batchInfo);
+                batchInfo,
+                transactionDate);
         }
 
         public static Transaction CreateOutbound(
@@ -69,7 +74,8 @@ namespace IMS.Domain.Aggregates
             int quantity,
             string sourceLocation,
             TransactionType type,
-            BatchInformation batchInfo = null)
+            BatchInformation? batchInfo = null,
+            DateTimeOffset? transactionDate = null)
         {
             if (!IsOutboundTransaction(type))
                 throw new ArgumentException("Invalid transaction type for outbound transaction", nameof(type));
@@ -83,7 +89,8 @@ namespace IMS.Domain.Aggregates
                 quantity,
                 sourceLocation,
                 null,
-                batchInfo);
+                batchInfo,
+                transactionDate);
         }
 
         public static Transaction CreateInternal(
@@ -92,7 +99,8 @@ namespace IMS.Domain.Aggregates
             string sourceLocation,
             string destinationLocation,
             TransactionType type,
-            BatchInformation batchInfo = null)
+            BatchInformation batchInfo = null,
+            DateTimeOffset? transactionDate = null)
         {
             if (!IsInternalTransaction(type))
                 throw new ArgumentException("Invalid transaction type for internal transaction", nameof(type));
@@ -106,7 +114,8 @@ namespace IMS.Domain.Aggregates
                 quantity,
                 sourceLocation,
                 destinationLocation,
-                batchInfo);
+                batchInfo,
+                transactionDate);
         }
 
         private static bool IsInboundTransaction(TransactionType type)
