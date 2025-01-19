@@ -2,6 +2,7 @@ using System;
 using IMS.Domain.Common;
 using IMS.Domain.Enums;
 using IMS.Domain.Events;
+using IMS.Domain.Events.Transactions;
 using IMS.Domain.ValueObjects;
 
 namespace IMS.Domain.Aggregates

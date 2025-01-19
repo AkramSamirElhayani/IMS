@@ -13,6 +13,8 @@ namespace IMS.Domain.ValueObjects
 
         private StockLevel(int current, int minimum, int maximum, int critical)
         {
+            if (current < 0)
+                throw new ArgumentException("Current stock level cannot be negative", nameof(current));
             if (minimum < 0)
                 throw new ArgumentException("Minimum stock level cannot be negative", nameof(minimum));
             if (maximum <= minimum)
