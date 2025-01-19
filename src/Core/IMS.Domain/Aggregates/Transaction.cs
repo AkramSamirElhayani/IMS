@@ -18,7 +18,7 @@ namespace IMS.Domain.Aggregates
         public string DestinationLocation { get; private set; }
         public BatchInformation BatchInfo { get; private set; }
         public DateTimeOffset TransactionDate { get; private set; }
-
+        public bool IsCompleted { get; private set; }
         private Transaction(
             TransactionReference reference,
             TransactionType type,
@@ -41,7 +41,7 @@ namespace IMS.Domain.Aggregates
             DestinationLocation = destinationLocation;
             BatchInfo = batchInfo;
             TransactionDate = transactionDate ?? DateTimeOffset.UtcNow;
-
+            IsCompleted = false;
             AddDomainEvent(new TransactionCreatedEvent(Id, ItemId, Type, Quantity));
         }
 
@@ -154,6 +154,7 @@ namespace IMS.Domain.Aggregates
 
         public void Complete()
         {
+            IsCompleted = true;
             AddDomainEvent(new TransactionCompletedEvent(
                 Id,
                 ItemId,

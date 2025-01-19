@@ -1,16 +1,17 @@
 using System;
+using MediatR;
 
 namespace IMS.Domain.Common
 {
-    public abstract record DomainEvent
+    public abstract record DomainEvent : IDomainEvent
     {
         public Guid Id { get; }
-        public DateTime OccurredOn { get; }
+        public DateTime DateOccurred { get; }
 
         protected DomainEvent()
         {
             Id = Guid.NewGuid();
-            OccurredOn = DateTime.UtcNow;
+            DateOccurred = DateTime.UtcNow;
         }
     }
 }

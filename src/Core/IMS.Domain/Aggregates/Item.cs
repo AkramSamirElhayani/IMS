@@ -17,7 +17,6 @@ namespace IMS.Domain.Aggregates
         public bool IsPerishable { get; private set; }
         public QualityStatus QualityStatus { get; private set; }
         public StockLevel StockLevel { get; private set; }
-        public BatchInformation? BatchInformation { get; private set; }
         public List<string> StorageLocations { get; private set; }
 
         private Item(
@@ -71,13 +70,7 @@ namespace IMS.Domain.Aggregates
             }
         }
 
-        public void AddBatchInformation(BatchInformation batchInfo)
-        {
-            if (!IsPerishable)
-                throw new InvalidOperationException("Cannot add batch information to non-perishable item");
 
-            BatchInformation = batchInfo ?? throw new ArgumentNullException(nameof(batchInfo));
-        }
 
         public void AddStorageLocation(string location)
         {
