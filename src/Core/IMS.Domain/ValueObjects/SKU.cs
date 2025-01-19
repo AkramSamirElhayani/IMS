@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace IMS.Domain.ValueObjects
 {
-    public class SKU : ValueObject
+    public sealed class SKU : ValueObject
     {
         public string Value { get; private set; }
 

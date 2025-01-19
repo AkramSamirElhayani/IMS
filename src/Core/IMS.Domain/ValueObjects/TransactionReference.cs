@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace IMS.Domain.ValueObjects
 {
-    public class TransactionReference : ValueObject
+    public sealed class TransactionReference : ValueObject
     {
         public string Value { get; private set; }
 

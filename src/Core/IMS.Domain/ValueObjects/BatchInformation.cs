@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace IMS.Domain.ValueObjects
 {
-    public class BatchInformation : ValueObject
+    public sealed class BatchInformation : ValueObject
     {
         public string BatchNumber { get; private set; }
         public DateTime ManufacturingDate { get; private set; }

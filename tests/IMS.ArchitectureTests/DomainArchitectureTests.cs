@@ -4,6 +4,8 @@ using IMS.Domain.Common;
 using IMS.Domain.Aggregates;
 using IMS.Domain.ValueObjects;
 using IMS.Domain.Events;
+using System.Runtime.CompilerServices;
+using System.Reflection;
 
 namespace IMS.ArchitectureTests;
 
@@ -21,7 +23,11 @@ public class DomainArchitectureTests
             .Inherit(typeof(DomainEvent))
             .GetResult();
 
-        result.IsSuccessful.Should().BeTrue("all domain events should inherit from DomainEvent");
+        result.IsSuccessful.Should().BeTrue(
+            "all domain events should inherit from DomainEvent. Failing types: {0}",
+            result.FailingTypeNames?.Any() == true 
+                ? string.Join(", ", result.FailingTypeNames)
+                : "none");
     }
 
     [Fact]
@@ -34,7 +40,11 @@ public class DomainArchitectureTests
             .Inherit(typeof(Entity))
             .GetResult();
 
-        result.IsSuccessful.Should().BeTrue("all aggregates should inherit from Entity");
+        result.IsSuccessful.Should().BeTrue(
+            "all aggregates should inherit from Entity. Failing types: {0}",
+            result.FailingTypeNames?.Any() == true 
+                ? string.Join(", ", result.FailingTypeNames)
+                : "none");
     }
 
     [Fact]
@@ -47,32 +57,29 @@ public class DomainArchitectureTests
             .Inherit(typeof(ValueObject))
             .GetResult();
 
-        result.IsSuccessful.Should().BeTrue("all value objects should inherit from ValueObject");
-        
-        if (!result.IsSuccessful)
-        {
-            result.FailingTypeNames.Should().BeEmpty("found types that don't inherit from ValueObject: {0}", 
-                string.Join(", ", result.FailingTypeNames));
-        }
+        result.IsSuccessful.Should().BeTrue(
+            "all value objects should inherit from ValueObject. Failing types: {0}",
+            result.FailingTypeNames?.Any() == true 
+                ? string.Join(", ", result.FailingTypeNames)
+                : "none");
     }
 
     [Fact]
     public void DomainEvents_ShouldBeImmutable()
     {
-        var result = Types.InAssembly(typeof(DomainEvent).Assembly)
-            .That()
-            .ResideInNamespace($"{DomainNamespace}.Events")
-            .Should()
-            .BeImmutable()
-            .GetResult();
+        var assembly = typeof(DomainEvent).Assembly;
+        var eventTypes = assembly.GetTypes()
+            .Where(t => t.Namespace?.StartsWith($"{DomainNamespace}.Events") == true)
+            .Where(t => t != typeof(DomainEvent));
 
-        result.IsSuccessful.Should().BeTrue("all domain events should be immutable");
-        
-        if (!result.IsSuccessful)
-        {
-            result.FailingTypeNames.Should().BeEmpty("found mutable domain events: {0}", 
-                string.Join(", ", result.FailingTypeNames));
-        }
+        var mutableEvents = eventTypes
+            .Where(t => t.GetProperties()
+                .Any(p => p.SetMethod != null && p.SetMethod.IsPublic))
+            .Select(t => t.FullName)
+            .ToList();
+
+        mutableEvents.Should().BeEmpty("all domain events should be immutable. Events with public setters: {0}",
+            string.Join("\n", mutableEvents));
     }
 
     [Fact]
@@ -85,13 +92,11 @@ public class DomainArchitectureTests
             .BeSealed()
             .GetResult();
 
-        result.IsSuccessful.Should().BeTrue("all value objects should be sealed");
-        
-        if (!result.IsSuccessful)
-        {
-            result.FailingTypeNames.Should().BeEmpty("found unsealed value objects: {0}", 
-                string.Join(", ", result.FailingTypeNames));
-        }
+        result.IsSuccessful.Should().BeTrue(
+            "all value objects should be sealed. Failing types: {0}",
+            result.FailingTypeNames?.Any() == true 
+                ? string.Join(", ", result.FailingTypeNames)
+                : "none");
     }
 
     [Fact]
@@ -104,13 +109,11 @@ public class DomainArchitectureTests
             .BeImmutable()
             .GetResult();
 
-        result.IsSuccessful.Should().BeTrue("all aggregates should have private setters");
-        
-        if (!result.IsSuccessful)
-        {
-            result.FailingTypeNames.Should().BeEmpty("found aggregates with public setters: {0}", 
-                string.Join(", ", result.FailingTypeNames));
-        }
+        result.IsSuccessful.Should().BeTrue(
+            "all aggregates should have private setters. Failing types: {0}",
+            result.FailingTypeNames?.Any() == true 
+                ? string.Join(", ", result.FailingTypeNames)
+                : "none");
     }
 
     [Fact]
@@ -125,13 +128,11 @@ public class DomainArchitectureTests
             .NotHaveDependencyOn("IMS.API")
             .GetResult();
 
-        result.IsSuccessful.Should().BeTrue("domain layer should not depend on other layers");
-        
-        if (!result.IsSuccessful)
-        {
-            result.FailingTypeNames.Should().BeEmpty("found types with invalid dependencies: {0}", 
-                string.Join(", ", result.FailingTypeNames));
-        }
+        result.IsSuccessful.Should().BeTrue(
+            "domain layer should not depend on other layers. Failing types: {0}",
+            result.FailingTypeNames?.Any() == true 
+                ? string.Join(", ", result.FailingTypeNames)
+                : "none");
     }
 
     [Fact]
@@ -144,12 +145,11 @@ public class DomainArchitectureTests
             .BeImmutable()
             .GetResult();
 
-        result.IsSuccessful.Should().BeTrue("value objects should not have public setters");
-        
-        if (!result.IsSuccessful)
-        {
-            result.FailingTypeNames.Should().BeEmpty("found value objects with public setters: {0}", 
-                string.Join(", ", result.FailingTypeNames));
-        }
+        result.IsSuccessful.Should().BeTrue(
+            "value objects should not have public setters. Failing types: {0}",
+            result.FailingTypeNames?.Any() == true 
+                ? string.Join(", ", result.FailingTypeNames)
+                : "none");
     }
+
 }

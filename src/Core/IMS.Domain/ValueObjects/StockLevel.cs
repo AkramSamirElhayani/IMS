@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace IMS.Domain.ValueObjects
 {
-    public class StockLevel : ValueObject
+    public sealed class StockLevel : ValueObject
     {
         public int Current { get; private set; }
         public int Minimum { get; private set; }
