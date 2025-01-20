@@ -8,4 +8,12 @@ public record Error(string Code, string Message)
     public static Error Validation(string message) => new("Validation", message);
     public static Error Conflict(string message) => new("Conflict", message);
     public static Error Unauthorized(string message) => new("Unauthorized", message);
+    public static Error Unexpected(string message) => new("Unexpected", message);
+
+    public static Error FromException(Exception exception)
+    {
+        var errorType = exception.GetType().Name.Replace("Exception", "Error");
+        var message = $"{exception.Message}";
+        return new Error(errorType, message);
+    }
 }

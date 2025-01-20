@@ -29,45 +29,31 @@ public class CreateTransactionCommandHandler : IRequestHandler<CreateTransaction
                 ? BatchInformation.Create(request.BatchNumber!, request.ManufactureDate.Value.DateTime, request.ExpiryDate.Value.DateTime)
                 : null;
 
-            var transaction = transactionType switch
-            {
-                TransactionType.TransferIn or TransactionType.Purchase => 
-                    Transaction.CreateInbound(
-                        Guid.Parse(request.ProductId),
-                        request.Quantity,
-                        "Warehouse", // We'll need to add this to the command later
-                        transactionType,
-                        batchInfo,
-                        request.TransactionDate),
+            // Create transaction based on type (inbound/outbound)
+            var transaction = transactionType.GetStockImpactMultiplier() > 0
+                ? Transaction.CreateInbound(
+                    Guid.Parse(request.ProductId),
+                    request.Quantity,
+                    "Warehouse",
+                    transactionType,
+                    batchInfo,
+                    request.TransactionDate)
+                : Transaction.CreateOutbound(
+                    Guid.Parse(request.ProductId),
+                    request.Quantity,
+                    "Warehouse",
+                    transactionType,
+                    batchInfo,
+                    request.TransactionDate);
 
-                TransactionType.TransferOut or TransactionType.Sale => 
-                    Transaction.CreateOutbound(
-                        Guid.Parse(request.ProductId),
-                        request.Quantity,
-                        "Warehouse", // We'll need to add this to the command later
-                        transactionType,
-                        batchInfo,
-                        request.TransactionDate),
-
-                _ => throw new ArgumentException("Invalid transaction type", nameof(request.Type))
-            };
-
-            await _unitOfWork.BeginTransactionAsync(cancellationToken);
-            await _transactionRepository.AddAsync(transaction, cancellationToken);
+            await _transactionRepository.AddAsync(transaction);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
-            await _unitOfWork.CommitAsync(cancellationToken);
 
-            return Result.Success(transaction.Id);
-        }
-        catch (ArgumentException ex)
-        {
-            await _unitOfWork.RollbackAsync(cancellationToken);
-            return Result.Failure<Guid>(Error.Validation(ex.Message));
+            return Result<Guid>.Success(transaction.Id);
         }
         catch (Exception ex)
         {
-            await _unitOfWork.RollbackAsync(cancellationToken);
-            return Result.Failure<Guid>(new Error("UnexpectedError", ex.Message));
+            return Result<Guid>.Failure(Error.FromException(ex));
         }
     }
 }

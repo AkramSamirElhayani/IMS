@@ -85,42 +85,7 @@ public class TransactionTests
         createdEvent.Quantity.Should().Be(quantity);
     }
 
-    [Fact]
-    public void CreateLocationTransfer_ShouldCreateTransactionWithCorrectProperties()
-    {
-        // Arrange
-        var itemId = Guid.NewGuid();
-        var quantity = 3;
-        var sourceLocation = "Warehouse A";
-        var destinationLocation = "Warehouse B";
-
-        // Act
-        var transaction = Transaction.CreateInternal(
-            itemId,
-            quantity,
-            sourceLocation,
-            destinationLocation,
-            TransactionType.LocationTransfer);
-
-        // Assert
-        transaction.Should().NotBeNull();
-        transaction.ItemId.Should().Be(itemId);
-        transaction.Type.Should().Be(TransactionType.LocationTransfer);
-        transaction.Quantity.Should().Be(quantity);
-        transaction.SourceLocation.Should().Be(sourceLocation);
-        transaction.DestinationLocation.Should().Be(destinationLocation);
-        transaction.BatchInfo.Should().BeNull();
-        
-        var createdEvent = transaction.DomainEvents.Should()
-            .ContainSingle(e => e is TransactionCreatedEvent)
-            .Subject as TransactionCreatedEvent;
-        
-        createdEvent.Should().NotBeNull();
-        createdEvent!.TransactionId.Should().Be(transaction.Id);
-        createdEvent.ItemId.Should().Be(itemId);
-        createdEvent.Type.Should().Be(TransactionType.LocationTransfer);
-        createdEvent.Quantity.Should().Be(quantity);
-    }
+   
 
     [Theory]
     [InlineData(0)]

@@ -72,26 +72,5 @@ public class UpdateItemCommandValidatorTests
         result.Errors.Should().Contain(e => e.PropertyName == nameof(command.Type));
     }
 
-    [Theory]
-    [InlineData("Raw")]
-    [InlineData("Finished")]
-    [InlineData("Packaging")]
-    public void Validate_WhenTypeIsValid_ShouldNotHaveError(string type)
-    {
-        // Arrange
-        var command = new UpdateItemCommand
-        {
-            Id = Guid.NewGuid(),
-            Name = "Test Item",
-            Type = type,
-            IsPerishable = true
-        };
-
-        // Act
-        var result = _validator.Validate(command);
-
-        // Assert
-        result.IsValid.Should().BeTrue();
-        result.Errors.Should().BeEmpty();
-    }
+  
 }

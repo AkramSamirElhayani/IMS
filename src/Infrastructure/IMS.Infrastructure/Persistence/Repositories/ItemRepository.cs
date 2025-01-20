@@ -94,16 +94,16 @@ public class ItemRepository : IItemRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<Item> AddAsync(Item entity, CancellationToken cancellationToken = default)
+    public async Task AddAsync(Item entity, CancellationToken cancellationToken = default)
     {
         await _context.Items.AddAsync(entity, cancellationToken);
-        return entity;
+
     }
 
-    public async Task<IEnumerable<Item>> AddRangeAsync(IEnumerable<Item> entities, CancellationToken cancellationToken = default)
+    public async Task AddRangeAsync(IEnumerable<Item> entities, CancellationToken cancellationToken = default)
     {
         await _context.Items.AddRangeAsync(entities, cancellationToken);
-        return entities;
+
     }
 
     public Task UpdateAsync(Item entity, CancellationToken cancellationToken = default)

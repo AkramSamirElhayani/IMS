@@ -59,18 +59,20 @@ namespace IMS.Domain.Aggregates
 
         public void UpdateStockLevel(int newQuantity, Guid? transactionId = null)
         {
+            if (newQuantity < 0)
+                throw new ArgumentException("Stock level cannot be negative", nameof(newQuantity));
+
             var oldQuantity = StockLevel.Current;
             StockLevel = StockLevel.Create(newQuantity, StockLevel.Minimum, StockLevel.Maximum, StockLevel.Critical);
             
             AddDomainEvent(new StockLevelChangedEvent(Id, oldQuantity, newQuantity, transactionId));
-
+            // Check if we've reached critical level
             if (newQuantity <= StockLevel.Critical)
             {
                 AddDomainEvent(new CriticalStockLevelReachedEvent(Id, newQuantity, StockLevel.Critical));
             }
         }
-
-
+ 
 
         public void AddStorageLocation(string location)
         {

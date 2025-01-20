@@ -93,65 +93,18 @@ namespace IMS.Domain.Aggregates
                 transactionDate);
         }
 
-        public static Transaction CreateInternal(
-            Guid itemId,
-            int quantity,
-            string sourceLocation,
-            string destinationLocation,
-            TransactionType type,
-            BatchInformation batchInfo = null,
-            DateTimeOffset? transactionDate = null)
-        {
-            if (!IsInternalTransaction(type))
-                throw new ArgumentException("Invalid transaction type for internal transaction", nameof(type));
-
-            var reference = TransactionReference.Create(DateTime.UtcNow, "INT");
-
-            return new Transaction(
-                reference,
-                type,
-                itemId,
-                quantity,
-                sourceLocation,
-                destinationLocation,
-                batchInfo,
-                transactionDate);
-        }
-
+  
         private static bool IsInboundTransaction(TransactionType type)
         {
-            return type == TransactionType.Purchase ||
-                   type == TransactionType.Return ||
-                   type == TransactionType.TransferIn;
+            return type > 0;
         }
 
         private static bool IsOutboundTransaction(TransactionType type)
         {
-            return type == TransactionType.Sale ||
-                   type == TransactionType.Consumption ||
-                   type == TransactionType.TransferOut;
+            return type < 0;
         }
-
-        private static bool IsInternalTransaction(TransactionType type)
-        {
-            return type == TransactionType.QualityStatusChange ||
-                   type == TransactionType.LocationTransfer;
-        }
-
-        // Helper method to determine if this transaction affects stock levels
-        public bool AffectsStock()
-        {
-            return Type != TransactionType.QualityStatusChange;
-        }
-
-        // Helper method to determine if this is a stock increase
-        public bool IsStockIncrease()
-        {
-            return Type == TransactionType.Purchase ||
-                   Type == TransactionType.Return ||
-                   Type == TransactionType.TransferIn;
-        }
-
+         
+     
         public void Complete()
         {
             IsCompleted = true;

@@ -1,17 +1,24 @@
 using System.Linq.Expressions;
 using IMS.Application.Common.Interfaces;
 using IMS.Domain.Aggregates;
+using IMS.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
+using Dapper;
 
 namespace IMS.Infrastructure.Persistence.Repositories;
 
 public class TransactionRepository : ITransactionRepository
 {
     private readonly IMSDbContext _context;
+    private readonly string _connectionString;
 
-    public TransactionRepository(IMSDbContext context)
+    public TransactionRepository(IMSDbContext context, IConfiguration configuration)
     {
         _context = context;
+        _connectionString = configuration.GetConnectionString("DefaultConnection") 
+            ?? throw new ArgumentNullException(nameof(configuration));
     }
 
     public async Task<Transaction?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
@@ -59,16 +66,14 @@ public class TransactionRepository : ITransactionRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<Transaction> AddAsync(Transaction entity, CancellationToken cancellationToken = default)
+    public async Task AddAsync(Transaction entity, CancellationToken cancellationToken = default)
     {
         await _context.Transactions.AddAsync(entity, cancellationToken);
-        return entity;
     }
 
-    public async Task<IEnumerable<Transaction>> AddRangeAsync(IEnumerable<Transaction> entities, CancellationToken cancellationToken = default)
+    public async Task AddRangeAsync(IEnumerable<Transaction> entities, CancellationToken cancellationToken = default)
     {
         await _context.Transactions.AddRangeAsync(entities, cancellationToken);
-        return entities;
     }
 
     public Task UpdateAsync(Transaction entity, CancellationToken cancellationToken = default)
@@ -93,5 +98,23 @@ public class TransactionRepository : ITransactionRepository
     {
         _context.Transactions.RemoveRange(entities);
         return Task.CompletedTask;
+    }
+
+    public async Task<int> CalculateTotalStockForItemAsync(Guid itemId, CancellationToken cancellationToken = default)
+    {
+        const string sql = @"
+            SELECT COALESCE(SUM(t.Quantity * 
+                CASE WHEN CAST(t.Type as int) > 0 THEN 1 ELSE -1 END
+            ), 0)
+            FROM Transactions t
+            WHERE t.ItemId = @ItemId 
+            AND t.Status = TRUE";
+
+        using var connection = new SqlConnection(_connectionString);
+        return await connection.QuerySingleAsync<int>(
+            sql,
+            new { 
+                ItemId = itemId
+            });
     }
 }

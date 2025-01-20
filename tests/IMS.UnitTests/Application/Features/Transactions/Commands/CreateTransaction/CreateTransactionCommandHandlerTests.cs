@@ -78,7 +78,7 @@ public class CreateTransactionCommandHandlerTests : TestBase
         Transaction? capturedTransaction = null;
         _transactionRepositoryMock.Setup(x => x.AddAsync(It.IsAny<Transaction>(), It.IsAny<CancellationToken>()))
             .Callback<Transaction, CancellationToken>((t, _) => capturedTransaction = t)
-            .ReturnsAsync((Transaction t, CancellationToken _) => t);
+            .Returns(Task.CompletedTask);
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -128,7 +128,7 @@ public class CreateTransactionCommandHandlerTests : TestBase
         Transaction? capturedTransaction = null;
         _transactionRepositoryMock.Setup(x => x.AddAsync(It.IsAny<Transaction>(), It.IsAny<CancellationToken>()))
             .Callback<Transaction, CancellationToken>((t, _) => capturedTransaction = t)
-            .ReturnsAsync((Transaction t, CancellationToken _) => t);
+            .Returns(Task.CompletedTask);
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
