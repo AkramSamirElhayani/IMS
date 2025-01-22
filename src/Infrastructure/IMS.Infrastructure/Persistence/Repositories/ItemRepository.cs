@@ -4,6 +4,7 @@ using IMS.Domain.Aggregates;
 using IMS.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 namespace IMS.Infrastructure.Persistence.Repositories;
 
 public class ItemRepository : IItemRepository
@@ -128,5 +129,81 @@ public class ItemRepository : IItemRepository
     {
         _context.Items.RemoveRange(entities);
         return Task.CompletedTask;
+    }
+
+    public async Task<IEnumerable<Item>> SearchItemsAsync(
+        string? searchTerm,
+        int? minQuantity = null,
+        int? maxQuantity = null,
+        string? sortBy = null,
+        bool isAscending = true,
+        CancellationToken cancellationToken = default)
+    {
+        var query = _context.Items
+            .Include(x => x.StorageLocations)
+            .AsQueryable();
+
+        // Apply search term filter
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            query = query.Where(x =>
+                x.Name.Contains(searchTerm) ||
+                x.SKU.Value.Contains(searchTerm) ||
+                x.Type.ToString().Contains(searchTerm));
+        }
+
+   
+
+        // Apply quantity range filter
+        if (minQuantity.HasValue)
+        {
+            query = query.Where(x => x.StockLevel.Current >= minQuantity.Value);
+        }
+        if (maxQuantity.HasValue)
+        {
+            query = query.Where(x => x.StockLevel.Current <= maxQuantity.Value);
+        }
+
+        // Apply sorting
+        if (!string.IsNullOrWhiteSpace(sortBy))
+        {
+            query = sortBy.ToLower() switch
+            {
+                "name" => isAscending ? query.OrderBy(x => x.Name) : query.OrderByDescending(x => x.Name),
+                "quantity" => isAscending ? query.OrderBy(x => x.StockLevel.Current) : query.OrderByDescending(x => x.StockLevel.Current),
+                "sku" => isAscending ? query.OrderBy(x => x.SKU.Value) : query.OrderByDescending(x => x.SKU.Value),
+                "type" => isAscending ? query.OrderBy(x => x.Type) : query.OrderByDescending(x => x.Type),
+                _ => isAscending ? query.OrderBy(x => x.Name) : query.OrderByDescending(x => x.Name)
+            };
+        }
+
+        return await query.ToListAsync(cancellationToken);
+    }
+
+    public async Task<int> GetTotalItemCountAsync(string? searchTerm = null, int? minQuantity = null, int? maxQuantity = null, CancellationToken cancellationToken = default)
+    {
+        var query = _context.Items
+            .Include(x => x.StorageLocations)
+            .AsQueryable();
+
+        // Apply search term filter
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            query = query.Where(x =>
+                x.Name.Contains(searchTerm) ||
+                x.SKU.Value.Contains(searchTerm) ||
+                x.Type.ToString().Contains(searchTerm));
+        }
+        // Apply quantity range filter
+        if (minQuantity.HasValue)
+        {
+            query = query.Where(x => x.StockLevel.Current >= minQuantity.Value);
+        }
+        if (maxQuantity.HasValue)
+        {
+            query = query.Where(x => x.StockLevel.Current <= maxQuantity.Value);
+        }
+
+        return await query.CountAsync();
     }
 }

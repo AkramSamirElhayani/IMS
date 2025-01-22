@@ -25,7 +25,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IMS.IntegrationTests", "tes
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentation", "{B9EEF099-A5DF-4B50-83F1-0EA6B1890D8C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IMS.App", "src\Presentation\IMS.App\IMS.App.csproj", "{6EB7568A-7C2A-4B31-B0F2-2E8B9B1E813B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IMS.Presentation", "src\Presentation\IMS.App\IMS.Presentation.csproj", "{6EB7568A-7C2A-4B31-B0F2-2E8B9B1E813B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

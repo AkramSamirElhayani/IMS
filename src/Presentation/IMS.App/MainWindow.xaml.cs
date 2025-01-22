@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -16,6 +16,8 @@ namespace IMS
     /// </summary>
     public partial class MainWindow : Window
     {
+     //   public Frame MainFrame => this.FindName("MainFrame") as Frame;
+
         public MainWindow()
         {
             InitializeComponent();

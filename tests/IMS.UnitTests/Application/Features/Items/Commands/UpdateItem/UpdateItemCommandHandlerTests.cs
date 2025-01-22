@@ -6,6 +6,7 @@ using IMS.Domain.ValueObjects;
 using IMS.UnitTests.Application.Common;
 using Moq;
 using FluentAssertions;
+using IMS.Application.Features.Items.Commands;
 
 namespace IMS.UnitTests.Application.Features.Items.Commands.UpdateItem;
 

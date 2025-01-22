@@ -19,6 +19,12 @@ namespace IMS.Domain.Aggregates
         public BatchInformation BatchInfo { get; private set; }
         public DateTimeOffset TransactionDate { get; private set; }
         public bool IsCompleted { get; private set; }
+
+        // Private parameterless constructor for EF Core
+        private Transaction()
+        {
+        }
+
         private Transaction(
             TransactionReference reference,
             TransactionType type,

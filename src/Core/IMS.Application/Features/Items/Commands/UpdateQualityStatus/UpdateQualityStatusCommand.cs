@@ -2,7 +2,7 @@ using IMS.Application.Common.Results;
 using IMS.Domain.Enums;
 using MediatR;
 
-namespace IMS.Application.Features.Items.Commands.UpdateQualityStatus;
+namespace IMS.Application.Features.Items.Commands;
 
 public record UpdateQualityStatusCommand : IRequest<Result>
 {

@@ -1,7 +1,7 @@
 using IMS.Application.Common.Results;
 using MediatR;
 
-namespace IMS.Application.Features.Items.Commands.RemoveStorageLocation;
+namespace IMS.Application.Features.Items.Commands;
 
 public record RemoveStorageLocationCommand : IRequest<Result>
 {

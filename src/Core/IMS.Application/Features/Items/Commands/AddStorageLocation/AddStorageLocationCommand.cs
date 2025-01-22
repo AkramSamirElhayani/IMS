@@ -1,7 +1,7 @@
 using IMS.Application.Common.Results;
 using MediatR;
 
-namespace IMS.Application.Features.Items.Commands.AddStorageLocation;
+namespace IMS.Application.Features.Items.Commands;
 
 public record AddStorageLocationCommand : IRequest<Result>
 {

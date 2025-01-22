@@ -19,6 +19,12 @@ namespace IMS.Domain.Aggregates
         public StockLevel StockLevel { get; private set; }
         public List<string> StorageLocations { get; private set; }
 
+        // Private parameterless constructor for EF Core
+        private Item()
+        {
+            StorageLocations = new List<string>();
+        }
+
         private Item(
             SKU sku,
             string name,
