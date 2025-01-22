@@ -163,5 +163,25 @@
     }
   },
   "active": "f8b0b9d935a66b02",
-  "lastOpenFiles": []
+  "lastOpenFiles": [
+    "tests/IMS.UITests/bin/Debug/net9.0-windows/IMS.UITests.pdb",
+    "tests/IMS.UITests/obj/Debug/net9.0-windows/ref/IMS.UITests.dll",
+    "tests/IMS.UITests/bin/Debug/net9.0-windows/IMS.UITests.dll",
+    "tests/IMS.UITests/bin/Debug/net9.0-windows/IMS.UITests.runtimeconfig.json",
+    "tests/IMS.UITests/obj/Debug/net9.0-windows/IMS.UITests.genruntimeconfig.cache",
+    "tests/IMS.UITests/bin/Debug/net9.0-windows/IMS.UITests.deps.json",
+    "tests/IMS.UITests/bin/Debug/net9.0-windows/xunit.runner.utility.netcoreapp10.dll",
+    "tests/IMS.UITests/bin/Debug/net9.0-windows/xunit.runner.visualstudio.testadapter.dll",
+    "tests/IMS.UITests/bin/Debug/net9.0-windows/xunit.runner.reporters.netcoreapp10.dll",
+    "tests/IMS.UITests/bin/Debug/net9.0-windows/testhost.exe",
+    "tests/IMS.UITests/bin/Debug/net9.0-windows/IMS.Presentation.exe",
+    "tests/IMS.ArchitectureTests/README.md",
+    "tests/IMS.UITests/README.md",
+    "tests/IMS.IntegrationTests/README.md",
+    "tests/IMS.UnitTests/README.md",
+    "src/Presentation/IMS.App/README.md",
+    "src/Infrastructure/README.md",
+    "src/Core/IMS.Application/README.md",
+    "src/Core/IMS.Domain/README.md"
+  ]
 }
