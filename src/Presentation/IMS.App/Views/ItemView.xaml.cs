@@ -6,6 +6,7 @@ namespace IMS.Presentation.Views
     {
         public ItemView()
         {
+
             InitializeComponent();
         }
     }

@@ -11,7 +11,6 @@ using MediatR;
 using System.ComponentModel.DataAnnotations;
 using IMS.Domain.ValueObjects;
 using IMS.Application.Features.Items.Commands;
-using IMSresentation.ViewModels;
 
 namespace IMS.Presentation.ViewModels
 {
@@ -38,12 +37,14 @@ namespace IMS.Presentation.ViewModels
         private bool _isPerishable;
 
         [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(SaveCommand))]
         [Required(ErrorMessage = "Type is required")]
         private string _type = string.Empty;
 
         [ObservableProperty]
         [Required(ErrorMessage = "SKU is required")]
         [RegularExpression(@"^[A-Z0-9]{6,10}$", ErrorMessage = "SKU must be 6-10 characters, uppercase letters and numbers only")]
+        [NotifyCanExecuteChangedFor(nameof(SaveCommand))]
         private string _sku = string.Empty;
 
         [ObservableProperty]
@@ -75,7 +76,7 @@ namespace IMS.Presentation.ViewModels
 
         public ItemViewModel(
             IMediator mediator,
-            IMS.Services.Interfaces.IDialogService dialogService,
+            IDialogService dialogService,
             INavigationService navigationService)
         {
             _mediator = mediator;
