@@ -31,61 +31,51 @@
 		<StackPanel Grid.Row="1" VerticalAlignment="Top">
 			<!-- Name -->
 			<StackPanel>
-				<TextBlock Text="Name:" FontWeight="SemiBold" />
-				<TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
-				<ItemsControl ItemsSource="{Binding ValidationErrors, Converter={StaticResource DictionaryValueConverter}, ConverterParameter=Name}">
-					<ItemsControl.ItemTemplate>
-						<DataTemplate>
-							<TextBlock Text="{Binding}" Foreground="Red" />
-						</DataTemplate>
-					</ItemsControl.ItemTemplate>
-				</ItemsControl>
+				<TextBlock Text="Name:" FontWeight="SemiBold" /> 
+				<TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" />
+				<TextBlock Foreground="Red" Text="{Binding Errors, Converter={StaticResource DictionaryValueConverter}, ConverterParameter=Name}" />
 			</StackPanel>
 
 			<!-- SKU -->
 			<StackPanel>
 				<TextBlock Text="SKU:" FontWeight="SemiBold" />
-				<TextBox Text="{Binding Sku, UpdateSourceTrigger=PropertyChanged}" />
-				<ItemsControl ItemsSource="{Binding ValidationErrors, Converter={StaticResource DictionaryValueConverter}, ConverterParameter=SKU}">
-					<ItemsControl.ItemTemplate>
-						<DataTemplate>
-							<TextBlock Text="{Binding}" Foreground="Red" />
-						</DataTemplate>
-					</ItemsControl.ItemTemplate>
-				</ItemsControl>
+				<TextBox Text="{Binding Sku, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" />
+				<TextBlock Foreground="Red" Text="{Binding Errors, Converter={StaticResource DictionaryValueConverter}, ConverterParameter=Sku}" />
 			</StackPanel>
-
+			<StackPanel>
+				<TextBlock Text="Type:" FontWeight="SemiBold" />
+				<ComboBox Text="{Binding Type, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}">
+					<ComboBoxItem>RawMaterial</ComboBoxItem>
+					<ComboBoxItem>FinishedGood</ComboBoxItem>
+					<ComboBoxItem>Consumable</ComboBoxItem> 
+				</ComboBox>
+				<TextBlock Foreground="Red" Text="{Binding Errors, Converter={StaticResource DictionaryValueConverter}, ConverterParameter=Type}" />
+			</StackPanel>
 			<!-- Quantity -->
 			<StackPanel>
 				<TextBlock Text="Quantity:" FontWeight="SemiBold" />
-				<TextBox Text="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}" />
-				<ItemsControl ItemsSource="{Binding ValidationErrors, Converter={StaticResource DictionaryValueConverter}, ConverterParameter=Name}">
-					<ItemsControl.ItemTemplate>
-						<DataTemplate>
-							<TextBlock Text="{Binding}" Foreground="Red" />
-						</DataTemplate>
-					</ItemsControl.ItemTemplate>
-				</ItemsControl>
+				<TextBox Text="{Binding Quantity, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" />
+				<TextBlock Foreground="Red" Text="{Binding Errors, Converter={StaticResource DictionaryValueConverter}, ConverterParameter=Quantity}" />
 			</StackPanel>
 
 			<!-- Minimum and Maximum Quantities -->
 			<StackPanel>
 				<TextBlock Text="Minimum Quantity:" FontWeight="SemiBold" />
-				<TextBox Text="{Binding MinimumQuantity, UpdateSourceTrigger=PropertyChanged}" />
-		 
+				<TextBox Text="{Binding MinimumQuantity, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" />
+				<TextBlock Foreground="Red" Text="{Binding Errors, Converter={StaticResource DictionaryValueConverter}, ConverterParameter=MinimumQuantity}" />
 			</StackPanel>
 
 			<StackPanel>
 				<TextBlock Text="Maximum Quantity:" FontWeight="SemiBold" />
-				<TextBox Text="{Binding MaximumQuantity, UpdateSourceTrigger=PropertyChanged}" />
-				
+				<TextBox Text="{Binding MaximumQuantity, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" />
+				<TextBlock Foreground="Red" Text="{Binding Errors, Converter={StaticResource DictionaryValueConverter}, ConverterParameter=MaximumQuantity}" />
 			</StackPanel>
 
 			<!-- Reorder Point -->
 			<StackPanel>
 				<TextBlock Text="Reorder Point:" FontWeight="SemiBold" />
-				<TextBox Text="{Binding ReorderPoint, UpdateSourceTrigger=PropertyChanged}" />
-		
+				<TextBox Text="{Binding ReorderPoint, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" />
+				<TextBlock Foreground="Red" Text="{Binding Errors, Converter={StaticResource DictionaryValueConverter}, ConverterParameter=ReorderPoint}" />
 			</StackPanel>
 
 			<!-- Is Perishable -->
@@ -93,6 +83,7 @@
 				<TextBlock Text="Is Perishable:" FontWeight="SemiBold" VerticalAlignment="Center" />
 				<CheckBox IsChecked="{Binding IsPerishable}" Margin="10,0,0,0" />
 			</StackPanel>
+			
 		</StackPanel>
 
 		<!-- Buttons -->

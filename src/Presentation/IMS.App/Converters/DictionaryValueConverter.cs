@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
@@ -12,16 +13,14 @@ public class DictionaryValueConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        Debug.WriteLine($"Converting Value {value} parameter {parameter}");
-        if (value is Dictionary<string, List<string>> dictionary && parameter is string key)
+        
+        if (value is IEnumerable<ValidationResult> validationErrors && parameter is string key)
         {
-            var result = dictionary.TryGetValue(key, out var list) ? list : null;
-            Debug.WriteLine($"Converting key {key} result {result}");
-
-
-            return result;
+            var result = validationErrors.FirstOrDefault(x => x.MemberNames.Contains( key));
+            Debug.WriteLine($"Converting key {key} result {result}"); 
+            return  result?.ErrorMessage;
         }
-        return "#";
+      // return "#";
 
         return null;
     }

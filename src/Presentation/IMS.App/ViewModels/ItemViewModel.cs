@@ -11,9 +11,10 @@ using MediatR;
 using System.ComponentModel.DataAnnotations;
 using IMS.Domain.ValueObjects;
 using IMS.Application.Features.Items.Commands;
-using IMS.Presentation.Validation;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using IMS.Presentation.Validation;
+using ValidationResult = System.ComponentModel.DataAnnotations.ValidationResult;
 
 namespace IMS.Presentation.ViewModels;
 
@@ -24,9 +25,8 @@ public partial class ItemViewModel : ViewModelBase,  IParameterizedViewModel
     private readonly IMediator _mediator;
     private readonly IDialogService _dialogService;
     private readonly INavigationService _navigationService;
-    private readonly IModelValidator<ItemViewModel> _validator;
+    //private readonly IModelValidator<ItemViewModel> _validator;
 
- 
 
     [ObservableProperty]
     [Required(ErrorMessage = "Name is required")]
@@ -70,39 +70,32 @@ public partial class ItemViewModel : ViewModelBase,  IParameterizedViewModel
     [ObservableProperty]
     private bool _isEditing;
 
-    [ObservableProperty]
-    private string _errorMessage = string.Empty;
+ 
 
-    private Guid _itemId;
+    private Guid _itemId; 
 
-    [ObservableProperty]
-    private ObservableCollection<string> _errors = new();
-
-    [ObservableProperty]
-    private Dictionary<string, List<string>> _validationErrors = new();
+    public IEnumerable<ValidationResult>? Errors => GetErrors()?.OfType<ValidationResult>();
     public ItemViewModel(
         IMediator mediator,
         IDialogService dialogService,
-        INavigationService navigationService,
-        IModelValidator<ItemViewModel> validator)
+        INavigationService navigationService)
     {
         _mediator = mediator;
         _dialogService = dialogService;
         _navigationService = navigationService;
-        _validator = validator;
         PropertyChanged += OnPropertyChanged;
-
+   
     }
     private void OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName != nameof(Errors) &&
-            e.PropertyName != nameof(IsBusy) &&
-            e.PropertyName != nameof(ValidationErrors))
+            e.PropertyName != nameof(IsBusy))
         {
-            ValidateProperty(e.PropertyName); 
+            ValidateProperty(this.GetType().GetProperty(e.PropertyName).GetValue(sender), e.PropertyName);
+            OnPropertyChanged(nameof(Errors));
         }
     }
-
+  
     [RelayCommand(CanExecute = nameof(CanSaveItem))]
     private async Task SaveAsync()
     {
@@ -110,13 +103,15 @@ public partial class ItemViewModel : ViewModelBase,  IParameterizedViewModel
 
         try
         {
-            ErrorMessage = string.Empty;
-          
-            if (!ValidateItem())
+
+            if (HasErrors)
             {
-                await _dialogService.ShowErrorAsync("Validation Error", string.Join("\n", Errors));
+                await _dialogService.ShowErrorAsync("Validation Error", $"Please fix the validation errors before saving.");
                 return;
             }
+
+           
+         
 
             if (_itemId != Guid.Empty)
             {
@@ -130,8 +125,7 @@ public partial class ItemViewModel : ViewModelBase,  IParameterizedViewModel
             _navigationService.NavigateTo<ItemsListViewModel>();
         }
         catch (Exception ex)
-        {
-            ErrorMessage = "Error saving item: " + ex.Message;
+        { 
             await _dialogService.ShowErrorAsync("Error", $"Failed to save item: {ex.Message}");
         }
         finally
@@ -174,43 +168,7 @@ public partial class ItemViewModel : ViewModelBase,  IParameterizedViewModel
     [RelayCommand]
     private void CancelEdit() => _navigationService.NavigateTo<ItemsListViewModel>();
 
-    private bool CanSaveItem() => !IsBusy && !string.IsNullOrWhiteSpace(Name) && ValidationErrors.Count == 0;
-
-    private void ValidateProperty(string propertyName)
-    {
-        var result = _validator.Validate(this);
-        UpdateValidationErrors(propertyName, result.Errors.GetValueOrDefault(propertyName, new List<string>()));
-    }
-    private bool ValidateItem()
-    {
-        var result = _validator.Validate(this);
-        ValidationErrors.Clear();
-        foreach (var error in result.Errors)
-        {
-            ValidationErrors[error.Key] = error.Value;
-        }
-        UpdateErrorsCollection();
-        return result.IsValid;
-    }
-
-    private void UpdateValidationErrors(string propertyName, List<string> propertyErrors)
-    {
-        if (!propertyErrors.Any())
-            ValidationErrors.Remove(propertyName);
-        else
-            ValidationErrors[propertyName] = propertyErrors;
-
-        UpdateErrorsCollection();
-    }
-
-    private void UpdateErrorsCollection()
-    {
-        Errors.Clear();
-        foreach (var error in ValidationErrors.Values.SelectMany(x => x))
-        {
-            Errors.Add(error);
-        }
-    }
+    private bool CanSaveItem() => !IsBusy && !string.IsNullOrWhiteSpace(Name) ;
 
 
     public void InitializeForEdit(GetItemResponse item)

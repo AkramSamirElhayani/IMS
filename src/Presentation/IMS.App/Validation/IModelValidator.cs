@@ -52,7 +52,7 @@ public class ItemValidator : AbstractValidator<ItemViewModel>, IModelValidator<I
             .WithMessage("Reorder point must be less than maximum quantity");
     }
 
-    public new  ValidationResult Validate(ItemViewModel model)
+    public new ValidationResult Validate(ItemViewModel model)
     {
         var fluentResult = base.Validate(model);
         return ConvertToValidationResult(fluentResult);

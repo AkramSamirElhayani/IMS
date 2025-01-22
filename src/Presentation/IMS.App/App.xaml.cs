@@ -8,7 +8,6 @@ using IMS.Presentation.ViewModels;
 using IMS.Presentation.Views;
 using IMS.Services.Interfaces;
 using IMS.Services;
-using IMS.Presentation.Validation;
 
 namespace IMS
 {
@@ -26,7 +25,7 @@ namespace IMS
                     services.AddInfrastructure(context.Configuration);
 
                     //Register Validation 
-                    services.AddSingleton<IModelValidator<ItemViewModel>, ItemValidator>();
+                    //services.AddSingleton<IModelValidator<ItemViewModel>, ItemValidator>();
 
                     // Register Services 
                     services.AddScoped<IDialogService , DialogService>();

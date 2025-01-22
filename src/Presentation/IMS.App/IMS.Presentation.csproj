@@ -36,4 +36,8 @@
     <Folder Include="Views\" />
   </ItemGroup>
 
+
+	<ItemGroup>
+		<InternalsVisibleTo Include="IMS.UITests" />
+	</ItemGroup>
 </Project>
