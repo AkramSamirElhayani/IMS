@@ -84,6 +84,130 @@ The solution follows Clean Architecture principles with clear separation of conc
 - ViewModels with clean separation from Views
 - UI-specific mapping and validation
 
+## Modular Monolith Architecture
+
+The project is designed to support a Modular Monolith architecture, allowing for the addition of new modules while maintaining loose coupling through event-driven communication.
+
+### Module Communication Pattern
+```
+┌────────────────────────────────────────────────────────────────┐
+│                     Integration Event Bus                      │
+└─────────────────┬─────────────────┬──────────────┬─────────────┘
+                  │                 │              │
+        ┌─────────▼──────┐  ┌──────▼───────┐ ┌─────▼────────┐
+        │  Inventory     │  │   Sales      │ │  Future      │
+        │   Module       │  │   Module     │ │  Module      │
+        └───────┬────────┘  └──────┬───────┘ └───────┬──────┘
+                │                  │                 │
+     ┌──────────▼──────────┐       │                 │
+     │    Domain Events    │       │                 │
+     └──────────┬──────────┘       │                 │
+                │                  │                 │
+     ┌──────────▼──────────┐       │                 │
+     │ Integration Events  │       │                 │
+     └──────────┬──────────┘       │                 │
+                │                  │                 │
+                └──────────────────┴─────────────────┘
+```
+
+### Module Independence and Communication
+
+1. **Module Structure**
+   - Each module has its own bounded context
+   - Independent domain model and business rules
+   - Separate data storage capabilities
+   - Module-specific UI components
+
+2. **Event Types**
+   - **Domain Events**: Internal to a module
+     - Handled within the same bounded context
+     - Maintain module's data consistency
+     - Trigger internal workflows
+   
+   - **Integration Events**: Between modules
+     - Cross-module communication
+     - Eventual consistency across modules
+     - Loose coupling between modules
+
+3. **Event Flow**
+   ```
+   ┌──────────┐    ┌───────────┐    ┌────────────┐    ┌──────────┐
+   │ Domain   │    │Integration│    │Event Bus   │    │Receiving │
+   │ Event    │───▶│Event      │───▶│            │───▶│Module    │
+   └──────────┘    └───────────┘    └────────────┘    └──────────┘
+   ```
+
+### Benefits of This Approach
+
+1. **Scalability**
+   - Modules can be developed independently
+   - Easy to add new modules
+   - Each module can scale separately
+
+2. **Maintainability**
+   - Clear module boundaries
+   - Independent deployment possible
+   - Easier to manage team ownership
+
+3. **Flexibility**
+   - Modules can use different technologies
+   - Easy to replace or upgrade modules
+   - Support for different data storage per module
+
+4. **Evolution Path**
+   - Can evolve into microservices if needed
+   - Gradual migration possibility
+   - No distributed system complexity initially
+
+### Implementation Details
+
+1. **Event Publishing**
+```csharp
+// Domain Event
+public class StockLevelChangedEvent : DomainEvent
+{
+    public Guid ItemId { get; }
+    public int NewQuantity { get; }
+}
+
+// Integration Event
+public class StockLevelUpdatedIntegrationEvent : IntegrationEvent
+{
+    public Guid ItemId { get; }
+    public int NewQuantity { get; }
+    public string ItemName { get; }
+}
+```
+
+2. **Event Transformation**
+```csharp
+public class StockLevelChangedEventHandler : 
+    INotificationHandler<StockLevelChangedEvent>
+{
+    private readonly IIntegrationEventService _integrationEventService;
+
+    public async Task Handle(StockLevelChangedEvent event)
+    {
+        // Transform domain event to integration event
+        var integrationEvent = new StockLevelUpdatedIntegrationEvent
+        {
+            ItemId = event.ItemId,
+            NewQuantity = event.NewQuantity
+        };
+
+        // Publish to other modules
+        await _integrationEventService.PublishThroughEventBus(integrationEvent);
+    }
+}
+```
+
+This architecture allows us to:
+- Start with a monolithic approach for simplicity
+- Maintain clear boundaries between modules
+- Support future growth and complexity
+- Enable easy addition of new modules
+- Maintain loose coupling through events
+
 ## Key Features
 
 1. **Clean Architecture**
@@ -230,6 +354,143 @@ These architectural decisions were made to create a maintainable, testable, and 
 4. **WPF with MVVM**: Selected for creating a rich desktop experience while maintaining testability and separation of concerns.
 
 5. **Comprehensive Testing Strategy**: Multiple testing layers ensure reliability and maintainability of the system.
+
+## Architecture and Interaction Diagrams
+
+### Clean Architecture Layers
+```
+┌──────────────────────────────────────────┐
+│            Presentation Layer            │
+│  ┌──────────────────────────────────┐   │
+│  │      Views       ViewModels      │   │
+│  └──────────────────────────────────┘   │
+├──────────────────────────────────────────┤
+│            Application Layer             │
+│  ┌─────────────┐      ┌──────────────┐  │
+│  │  Commands   │      │   Queries    │  │
+│  │   Handlers  │      │   Handlers   │  │
+│  └─────────────┘      └──────────────┘  │
+├──────────────────────────────────────────┤
+│              Domain Layer                │
+│  ┌─────────┐ ┌─────────┐ ┌──────────┐  │
+│  │Entities │ │  Value  │ │ Domain   │  │
+│  │         │ │ Objects │ │ Services │  │
+│  └─────────┘ └─────────┘ └──────────┘  │
+├──────────────────────────────────────────┤
+│          Infrastructure Layer            │
+│  ┌──────────┐ ┌───────────┐ ┌───────┐  │
+│  │Repository│ │Persistence│ │External│  │
+│  │   Impl   │ │  Context  │ │Services│  │
+│  └──────────┘ └───────────┘ └───────┘  │
+└──────────────────────────────────────────┘
+```
+
+### CQRS Flow with MediatR
+```
+┌──────────┐     ┌───────────┐     ┌──────────┐
+│          │     │           │     │Command   │
+│   UI     │────▶│  MediatR  │────▶│Handler   │
+│          │     │           │     │          │
+└──────────┘     └───────────┘     └──────────┘
+     │                │                  │
+     │                │                  │
+     │                ▼                  ▼
+┌──────────┐     ┌───────────┐     ┌──────────┐
+│          │     │           │     │Query     │
+│  View    │◀────│  Result   │◀────│Handler   │
+│          │     │           │     │          │
+└──────────┘     └───────────┘     └──────────┘
+```
+
+### Event Flow and Domain Events
+```
+┌──────────┐    ┌───────────┐    ┌──────────────┐
+│Command   │    │  Domain   │    │EventHandler 1│
+│Handler   │───▶│  Event    │───▶│(Notification)│
+└──────────┘    └───────────┘    └──────────────┘
+                      │
+                      │          ┌──────────────┐
+                      └─────────▶│EventHandler 2│
+                      │          │(Email)       │
+                      │          └──────────────┘
+                      │
+                      │          ┌──────────────┐
+                      └─────────▶│EventHandler 3│
+                                │(Logging)      │
+                                └──────────────┘
+```
+
+### MVVM Pattern Implementation
+```
+┌───────────────────────────────────────┐
+│               View                    │
+│  ┌─────────────┐    ┌─────────────┐  │
+│  │   XAML UI   │◀──▶│   Code      │  │
+│  │             │    │   Behind     │  │
+│  └─────────────┘    └─────────────┘  │
+│           ▲                ▲          │
+│           │                │          │
+│           ▼                ▼          │
+│  ┌─────────────────────────────────┐ │
+│  │         Data Binding            │ │
+│  └─────────────────────────────────┘ │
+└───────────────┬───────────────────────┘
+                │
+                ▼
+┌───────────────────────────────────────┐
+│            ViewModel                  │
+│  ┌─────────────┐    ┌─────────────┐  │
+│  │  Properties │    │  Commands   │  │
+│  │             │    │             │  │
+│  └─────────────┘    └─────────────┘  │
+│           ▲                ▲          │
+│           │                │          │
+│           ▼                ▼          │
+│  ┌─────────────────────────────────┐ │
+│  │      Property Changed Events    │ │
+│  └─────────────────────────────────┘ │
+└───────────────┬───────────────────────┘
+                │
+                ▼
+┌───────────────────────────────────────┐
+│              Model                    │
+│  ┌─────────────┐    ┌─────────────┐  │
+│  │   Domain    │    │  Business   │  │
+│  │   Entities  │    │   Logic     │  │
+│  └─────────────┘    └─────────────┘  │
+└───────────────────────────────────────┘
+```
+
+### Repository Pattern with Specification
+```
+┌──────────┐     ┌───────────┐     ┌──────────┐
+│          │     │           │     │          │
+│ViewModel │────▶│Repository │────▶│  Spec    │
+│          │     │           │     │          │
+└──────────┘     └───────────┘     └──────────┘
+                       │                 │
+                       │                 ▼
+                       │           ┌──────────┐
+                       │           │Expression│
+                       │           │  Tree    │
+                       │           └──────────┘
+                       ▼                 │
+                 ┌───────────┐          │
+                 │           │          │
+                 │   EF     │◀─────────┘
+                 │ Context  │
+                 │          │
+                 └───────────┘
+```
+
+These diagrams illustrate:
+1. The layered architecture and dependencies
+2. How commands and queries flow through the system
+3. How domain events are published and handled
+4. The MVVM pattern implementation
+5. How the repository pattern works with specifications
+
+Each component is clearly separated and shows its relationships with other parts of the system. The arrows indicate the direction of dependencies and data flow.
 
 ## Getting Started
 
