@@ -1,3 +1,5 @@
+using IMS.ViewModels;
+
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -18,8 +20,9 @@ namespace IMS
     {
      //   public Frame MainFrame => this.FindName("MainFrame") as Frame;
 
-        public MainWindow()
+        public MainWindow(MainWindowViewModel mainViewModel)
         {
+            DataContext = mainViewModel;
             InitializeComponent();
         }
     }

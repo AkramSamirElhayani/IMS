@@ -5,6 +5,10 @@ using IMS.ViewModels;
 using IMS.Infrastructure;
 using IMS.Application;
 using IMS.Presentation.ViewModels;
+using IMS.Presentation.Views;
+using IMS.Services.Interfaces;
+using IMS.Services;
+using IMS.Presentation.Validation;
 
 namespace IMS
 {
@@ -21,17 +25,26 @@ namespace IMS
                     services.AddApplication();
                     services.AddInfrastructure(context.Configuration);
 
+                    //Register Validation 
+                    services.AddSingleton<IModelValidator<ItemViewModel>, ItemValidator>();
+
+                    // Register Services 
+                    services.AddScoped<IDialogService , DialogService>();
+                    services.AddScoped<INavigationService , NavigationService>();
                     // Register ViewModels
-                    services.AddTransient<MainViewModel>();
+                    services.AddTransient<MainWindowViewModel>();
                     services.AddTransient<ItemViewModel>(); 
 
+                    // Register Views
+                    services.AddScoped<MainWindow>();
+                    services.AddTransient<ItemView>();
 
                   
                 })
                 .Build();
         }
 
-        protected override async void OnStartup(StartupEventArgs e)
+        protected override async void OnStartup(  StartupEventArgs e)
         {
             await _host.StartAsync();
 

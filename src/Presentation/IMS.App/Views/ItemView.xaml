@@ -4,7 +4,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:IMS.Presentation.ViewModels"
-	    
+	    xmlns:converters="clr-namespace:IMS.Presentation.Converters"
+
         mc:Ignorable="d"
         Title="Item Details" Height="600" Width="500"
         WindowStartupLocation="CenterScreen" 
@@ -13,96 +14,91 @@
     
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+		<converters:DictionaryValueConverter x:Key="DictionaryValueConverter" />
     </Window.Resources>
 
-    <Grid Margin="20">
-        <StackPanel VerticalAlignment="Top" Margin="0,5">
-            <!-- Header -->
-            <TextBlock Text="{Binding IsEditing, StringFormat={}{0:Edit Item|New Item}}"
-                     FontSize="24" 
-                     FontWeight="Bold"
-                     HorizontalAlignment="Center"/>
+	<Grid Margin="20">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="*" />
+			<RowDefinition Height="Auto" />
+		</Grid.RowDefinitions>
 
-            <!-- Error Message -->
-            <TextBlock Text="{Binding ErrorMessage}" 
-                     Foreground="Red" 
-                     TextWrapping="Wrap"
-                     Margin="0,0,0,5"
-                     Visibility="{Binding ErrorMessage, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+		<!-- Header -->
+		<TextBlock Grid.Row="0" Text="Item Details" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,20" />
 
-            <!-- Form Fields -->
-            <StackPanel Margin="0,5">
-                <!-- Name -->
-                <Label Content="Name:" FontWeight="Bold"/>
-                <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
-                       Padding="5"/>
-                <TextBlock Text="{Binding ValidationErrors[Name][0]}" 
-                         Foreground="Red"/>
+		<!-- Form Fields -->
+		<StackPanel Grid.Row="1" VerticalAlignment="Top">
+			<!-- Name -->
+			<StackPanel>
+				<TextBlock Text="Name:" FontWeight="SemiBold" />
+				<TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
+				<ItemsControl ItemsSource="{Binding ValidationErrors, Converter={StaticResource DictionaryValueConverter}, ConverterParameter=Name}">
+					<ItemsControl.ItemTemplate>
+						<DataTemplate>
+							<TextBlock Text="{Binding}" Foreground="Red" />
+						</DataTemplate>
+					</ItemsControl.ItemTemplate>
+				</ItemsControl>
+			</StackPanel>
 
-                <!-- SKU -->
-                <Label Content="SKU:" FontWeight="Bold"/>
-                <TextBox Text="{Binding Sku, UpdateSourceTrigger=PropertyChanged}"
-                       Padding="5"/>
-                <TextBlock Text="{Binding ValidationErrors[Sku][0]}" 
-                         Foreground="Red"/>
+			<!-- SKU -->
+			<StackPanel>
+				<TextBlock Text="SKU:" FontWeight="SemiBold" />
+				<TextBox Text="{Binding Sku, UpdateSourceTrigger=PropertyChanged}" />
+				<ItemsControl ItemsSource="{Binding ValidationErrors, Converter={StaticResource DictionaryValueConverter}, ConverterParameter=SKU}">
+					<ItemsControl.ItemTemplate>
+						<DataTemplate>
+							<TextBlock Text="{Binding}" Foreground="Red" />
+						</DataTemplate>
+					</ItemsControl.ItemTemplate>
+				</ItemsControl>
+			</StackPanel>
 
-                <!-- Type -->
-                <Label Content="Type:" FontWeight="Bold"/>
-                <TextBox Text="{Binding Type, UpdateSourceTrigger=PropertyChanged}"
-                       Padding="5"/>
-                <TextBlock Text="{Binding ValidationErrors[Type][0]}" 
-                         Foreground="Red"/>
+			<!-- Quantity -->
+			<StackPanel>
+				<TextBlock Text="Quantity:" FontWeight="SemiBold" />
+				<TextBox Text="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}" />
+				<ItemsControl ItemsSource="{Binding ValidationErrors, Converter={StaticResource DictionaryValueConverter}, ConverterParameter=Name}">
+					<ItemsControl.ItemTemplate>
+						<DataTemplate>
+							<TextBlock Text="{Binding}" Foreground="Red" />
+						</DataTemplate>
+					</ItemsControl.ItemTemplate>
+				</ItemsControl>
+			</StackPanel>
 
-                <!-- Quantity -->
-                <Label Content="Quantity:" FontWeight="Bold"/>
-                <TextBox Text="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}"
-                       Padding="5"/>
-                <TextBlock Text="{Binding ValidationErrors[Quantity][0]}" 
-                         Foreground="Red"/>
+			<!-- Minimum and Maximum Quantities -->
+			<StackPanel>
+				<TextBlock Text="Minimum Quantity:" FontWeight="SemiBold" />
+				<TextBox Text="{Binding MinimumQuantity, UpdateSourceTrigger=PropertyChanged}" />
+		 
+			</StackPanel>
 
-                <!-- Is Perishable -->
-                <CheckBox Content="Is Perishable" 
-                        IsChecked="{Binding IsPerishable}"/>
+			<StackPanel>
+				<TextBlock Text="Maximum Quantity:" FontWeight="SemiBold" />
+				<TextBox Text="{Binding MaximumQuantity, UpdateSourceTrigger=PropertyChanged}" />
+				
+			</StackPanel>
 
-                <!-- Minimum Quantity -->
-                <Label Content="Minimum Quantity:" FontWeight="Bold"/>
-                <TextBox Text="{Binding MinimumQuantity, UpdateSourceTrigger=PropertyChanged}"
-                       Padding="5"/>
-                <TextBlock Text="{Binding ValidationErrors[MinimumQuantity][0]}" 
-                         Foreground="Red"/>
+			<!-- Reorder Point -->
+			<StackPanel>
+				<TextBlock Text="Reorder Point:" FontWeight="SemiBold" />
+				<TextBox Text="{Binding ReorderPoint, UpdateSourceTrigger=PropertyChanged}" />
+		
+			</StackPanel>
 
-                <!-- Maximum Quantity -->
-                <Label Content="Maximum Quantity:" FontWeight="Bold"/>
-                <TextBox Text="{Binding MaximumQuantity, UpdateSourceTrigger=PropertyChanged}"
-                       Padding="5"/>
-                <TextBlock Text="{Binding ValidationErrors[MaximumQuantity][0]}" 
-                         Foreground="Red"/>
+			<!-- Is Perishable -->
+			<StackPanel Orientation="Horizontal">
+				<TextBlock Text="Is Perishable:" FontWeight="SemiBold" VerticalAlignment="Center" />
+				<CheckBox IsChecked="{Binding IsPerishable}" Margin="10,0,0,0" />
+			</StackPanel>
+		</StackPanel>
 
-                <!-- Reorder Point -->
-                <Label Content="Reorder Point:" FontWeight="Bold"/>
-                <TextBox Text="{Binding ReorderPoint, UpdateSourceTrigger=PropertyChanged}"
-                       Padding="5"/>
-                <TextBlock Text="{Binding ValidationErrors[ReorderPoint][0]}" 
-                         Foreground="Red"/>
-
-                <!-- Buttons -->
-                <StackPanel Orientation="Horizontal" 
-                          HorizontalAlignment="Center" 
-                          Margin="0,20,0,0">
-                    <Button Content="Save" 
-                           Command="{Binding SaveCommand}"
-                           Width="100"
-                           Height="30"
-                           Margin="0,0,10,0"
-                           Background="#007ACC"
-                           Foreground="White"/>
-                    <Button Content="Cancel" 
-                           Command="{Binding CancelEditCommand}"
-                           Width="100"
-                           Height="30"
-                           Background="#E0E0E0"/>
-                </StackPanel>
-            </StackPanel>
-        </StackPanel>
-    </Grid>
+		<!-- Buttons -->
+		<StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0">
+			<Button Content="Save" Command="{Binding SaveCommand}" Width="100" IsEnabled="{Binding Path=SaveCommand.CanExecute}" />
+			<Button Content="Cancel" Command="{Binding CancelEditCommand}" Width="100" />
+		</StackPanel>
+	</Grid>
 </Window>
